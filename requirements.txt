@@ -1,0 +1,36 @@
+# requirements.txt
+
+# AI 3D Generator - Dependencies
+
+# Core Requirements
+# Note: Most dependencies are included with Blender
+# This file is for reference and for standalone usage of provider clients
+
+# HTTP requests library (included with Blender)
+# Uncomment if running provider clients standalone
+# requests>=2.25.0,<3.0.0
+
+# For type checking (optional, development only)
+# mypy>=0.900
+# types-requests>=2.25.0
+
+# For testing (optional, development only)
+# pytest>=6.0.0
+# pytest-cov>=2.10.0
+
+# For code formatting (optional, development only)
+# black>=21.0
+# flake8>=3.8.0
+
+# Notes:
+# 1. Blender includes 'requests' library by default
+# 2. No external pip packages required to run addon
+# 3. Standard library only: abc, tempfile, os, logging, pathlib
+# 4. Type hints use typing module (Python 3.10+)
+
+# Blender Version:
+# Blender 3.0.0+ includes Python 3.10+
+# All dependencies bundled by Blender
+
+# To install for standalone testing:
+# pip install requests>=2.25.0
