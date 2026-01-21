@@ -114,6 +114,12 @@ class AI3DGeneratorPreferences(AddonPreferences):
         row.label(text="API Key:", icon='LOCKED')
         row.prop(self, "tripo_api_key", text="")
         
+        # Sync button
+        row = box.row(align=True)
+        row.scale_y = 1.2
+        op = row.operator("ai3d.validate_api_key", text="🔄 Sinkronisasi API", icon='FILE_REFRESH')
+        op.provider = "TRIPO"
+        
         # Base URL
         row = box.row()
         row.prop(self, "tripo_base_url")
@@ -144,6 +150,12 @@ class AI3DGeneratorPreferences(AddonPreferences):
         row.label(text="API Key:", icon='LOCKED')
         row.prop(self, "meshy_api_key", text="")
         
+        # Sync button
+        row = box.row(align=True)
+        row.scale_y = 1.2
+        op = row.operator("ai3d.validate_api_key", text="🔄 Sinkronisasi API", icon='FILE_REFRESH')
+        op.provider = "MESHY"
+        
         # Base URL
         row = box.row()
         row.prop(self, "meshy_base_url")
@@ -173,6 +185,12 @@ class AI3DGeneratorPreferences(AddonPreferences):
         row = box.row(align=True)
         row.label(text="API Key:", icon='LOCKED')
         row.prop(self, "modelslab_api_key", text="")
+        
+        # Sync button
+        row = box.row(align=True)
+        row.scale_y = 1.2
+        op = row.operator("ai3d.validate_api_key", text="🔄 Sinkronisasi API", icon='FILE_REFRESH')
+        op.provider = "MODELSLAB"
         
         # Base URL
         row = box.row()

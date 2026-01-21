@@ -185,3 +185,31 @@ class ModelsLabClient(BaseProviderClient):
             return False, f"Cannot connect to ModelsLab API: {self.base_url}"
         except requests.exceptions.RequestException as e:
             return False, f"ModelsLab connection error: {str(e)}"
+    
+    def validate_api_key(self) -> tuple[bool, str]:
+        """Validate API key dengan ModelsLab server."""
+        try:
+            response = requests.get(
+                f"{self.base_url}/api/v1/user/info",
+                headers=self._get_headers(),
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                user_data = data.get("data", data.get("user", {}))
+                credits = user_data.get("credits", user_data.get("balance", 0))
+                return True, f"✓ API Key Valid | Credits: {credits}"
+            elif response.status_code == 401:
+                return False, "✗ Invalid API Key - Please check your ModelsLab API key"
+            elif response.status_code == 429:
+                return False, "⚠ Rate limit exceeded - Try again later"
+            else:
+                return False, f"✗ API Error: {response.status_code}"
+        
+        except requests.exceptions.Timeout:
+            return False, "✗ Request timeout - Check your internet connection"
+        except requests.exceptions.ConnectionError:
+            return False, f"✗ Cannot reach ModelsLab API at {self.base_url}"
+        except Exception as e:
+            return False, f"✗ Validation error: {str(e)}"

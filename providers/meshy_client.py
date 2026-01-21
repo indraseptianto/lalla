@@ -194,3 +194,32 @@ class MeshyClient(BaseProviderClient):
             return False, f"Cannot connect to Meshy API: {self.base_url}"
         except requests.exceptions.RequestException as e:
             return False, f"Meshy connection error: {str(e)}"
+    
+    def validate_api_key(self) -> tuple[bool, str]:
+        """Validate API key dengan Meshy server."""
+        try:
+            # Gunakan endpoint yang tidak memerlukan resources
+            response = requests.get(
+                f"{self.base_url}/openapi/v1/user/profile",
+                headers=self._get_headers(),
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                user_info = data.get("result", {})
+                credits = user_info.get("balance", 0)
+                return True, f"✓ API Key Valid | Credits: {credits}"
+            elif response.status_code == 401:
+                return False, "✗ Invalid API Key - Please check your Meshy API key"
+            elif response.status_code == 429:
+                return False, "⚠ Rate limit exceeded - Try again later"
+            else:
+                return False, f"✗ API Error: {response.status_code}"
+        
+        except requests.exceptions.Timeout:
+            return False, "✗ Request timeout - Check your internet connection"
+        except requests.exceptions.ConnectionError:
+            return False, f"✗ Cannot reach Meshy API at {self.base_url}"
+        except Exception as e:
+            return False, f"✗ Validation error: {str(e)}"

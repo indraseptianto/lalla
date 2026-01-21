@@ -174,3 +174,31 @@ class TripoClient(BaseProviderClient):
             return False, f"Cannot connect to Tripo API: {self.base_url}"
         except requests.exceptions.RequestException as e:
             return False, f"Tripo connection error: {str(e)}"
+    
+    def validate_api_key(self) -> tuple[bool, str]:
+        """Validate API key dengan Tripo server."""
+        try:
+            response = requests.get(
+                f"{self.base_url}/api/v1/user",
+                headers=self._get_headers(),
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                user_info = data.get("data", {})
+                credits = user_info.get("credits", user_info.get("balance", 0))
+                return True, f"✓ API Key Valid | Credits: {credits}"
+            elif response.status_code == 401:
+                return False, "✗ Invalid API Key - Please check your Tripo API key"
+            elif response.status_code == 429:
+                return False, "⚠ Rate limit exceeded - Try again later"
+            else:
+                return False, f"✗ API Error: {response.status_code}"
+        
+        except requests.exceptions.Timeout:
+            return False, "✗ Request timeout - Check your internet connection"
+        except requests.exceptions.ConnectionError:
+            return False, f"✗ Cannot reach Tripo API at {self.base_url}"
+        except Exception as e:
+            return False, f"✗ Validation error: {str(e)}"

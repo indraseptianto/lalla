@@ -455,6 +455,64 @@ class AI3DOpenPreferences(Operator):
                 return {'FINISHED'}
 
 
+class AI3DValidateAPIKey(Operator):
+    """Validate API key dengan server provider."""
+    
+    bl_idname = "ai3d.validate_api_key"
+    bl_label = "Validate API Key"
+    bl_description = "Validate API key dengan provider server"
+    
+    provider: StringProperty(default="TRIPO")
+    
+    def execute(self, context):
+        """Execute API key validation."""
+        try:
+            prefs = context.preferences.addons['ai_3d_generator'].preferences
+        except (AttributeError, RuntimeError):
+            # Fallback
+            import bpy
+            addon_prefs = bpy.context.preferences.addons.get('ai_3d_generator')
+            if addon_prefs:
+                prefs = addon_prefs.preferences
+            else:
+                self.report({'ERROR'}, "Cannot access addon preferences")
+                return {'FINISHED'}
+        
+        # Get provider and API key
+        provider = self.provider
+        
+        if provider == 'TRIPO':
+            api_key = prefs.tripo_api_key
+            base_url = prefs.tripo_base_url
+            client = TripoClient(api_key, base_url)
+        elif provider == 'MESHY':
+            api_key = prefs.meshy_api_key
+            base_url = prefs.meshy_base_url
+            client = MeshyClient(api_key, base_url)
+        elif provider == 'MODELSLAB':
+            api_key = prefs.modelslab_api_key
+            base_url = prefs.modelslab_base_url
+            client = ModelsLabClient(api_key, base_url)
+        else:
+            self.report({'ERROR'}, "Unknown provider")
+            return {'FINISHED'}
+        
+        # Check if API key is set
+        if not api_key or not api_key.strip():
+            self.report({'ERROR'}, f"{provider}: API key not set")
+            return {'FINISHED'}
+        
+        # Validate API key
+        is_valid, message = client.validate_api_key()
+        
+        if is_valid:
+            self.report({'INFO'}, f"{provider}: {message}")
+        else:
+            self.report({'ERROR'}, f"{provider}: {message}")
+        
+        return {'FINISHED'}
+
+
 def register():
     """Register operators."""
     bpy.utils.register_class(AI3DGenerateText)
@@ -463,6 +521,7 @@ def register():
     bpy.utils.register_class(AI3DCheckStatus)
     bpy.utils.register_class(AI3DCancelGeneration)
     bpy.utils.register_class(AI3DOpenPreferences)
+    bpy.utils.register_class(AI3DValidateAPIKey)
 
 
 def unregister():
@@ -473,3 +532,4 @@ def unregister():
     bpy.utils.unregister_class(AI3DCheckStatus)
     bpy.utils.unregister_class(AI3DCancelGeneration)
     bpy.utils.unregister_class(AI3DOpenPreferences)
+    bpy.utils.unregister_class(AI3DValidateAPIKey)
